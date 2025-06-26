@@ -7,6 +7,15 @@ import { LogOut, Settings, User } from "lucide-react"
 import type { UserData, AccountType, Language } from "@/app/page"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/animate-ui/components/tooltip"
 import { AccountTypeDropdown } from "@/components/ui/account-type-dropdown"
+import { useState } from "react"
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog"
 
 interface UserProfileSectionProps {
   userData: UserData
@@ -35,6 +44,7 @@ const translations = {
 }
 
 export function UserProfileSection({ userData, onAccountTypeChange, onLogout, language }: UserProfileSectionProps) {
+  const [open, setOpen] = useState(false)
   const t = translations[language]
   const brokerName = userData.broker === "iq-option" ? "IQ Option" : "TradingView"
 
@@ -64,16 +74,44 @@ export function UserProfileSection({ userData, onAccountTypeChange, onLogout, la
         </div>
       </div>
 
-      {/* Botón de logout directo */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="flex items-center gap-2 text-red-600 hover:bg-accent/40 border"
-        onClick={onLogout}
-      >
-        <LogOut className="h-4 w-4" />
-    
-      </Button>
+      {/* Botón de logout con diálogo de confirmación */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-2 text-red-600 hover:bg-accent/40 border"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogTitle>
+            {language === "en" ? "Confirm Logout" : "Confirmar cierre de sesión"}
+          </DialogTitle>
+          <p>
+            {language === "en"
+              ? "Are you sure you want to log out?"
+              : "¿Estás seguro que deseas cerrar sesión?"}
+          </p>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">
+                {language === "en" ? "Cancel" : "Cancelar"}
+              </Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setOpen(false)
+                onLogout()
+              }}
+            >
+              {language === "en" ? "Logout" : "Cerrar sesión"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
