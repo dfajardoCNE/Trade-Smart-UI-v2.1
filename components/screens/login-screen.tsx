@@ -45,7 +45,7 @@ export function LoginScreen({ broker, onLogin, onBack }: LoginScreenProps) {
       accountType: "PRACTICE",
       balance: 10000,
       broker,
-      avatar: "/placeholder.svg?height=40&width=40",
+      avatar: "/avatar.png?height=40&width=40",
     }
 
     onLogin(userData)

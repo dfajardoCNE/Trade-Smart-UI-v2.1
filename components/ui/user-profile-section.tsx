@@ -55,9 +55,13 @@ export function UserProfileSection({ userData, onAccountTypeChange, onLogout, la
         <Tooltip side="bottom">
           <TooltipTrigger>
             <Avatar className="h-10 w-10 border-2 border-background shadow-md">
-              <AvatarImage src={userData.avatar || "/placeholder.svg"} alt={userData.username} />
+              <AvatarImage
+              src={userData.avatar || "/avatar.png"}
+              alt={userData.username}
+              loading="lazy"
+              />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
-                {userData.username.charAt(0).toUpperCase()}
+              {userData.username?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
           </TooltipTrigger>
