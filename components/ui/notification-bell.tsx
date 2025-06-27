@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { Bell, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react"
+import { Bell, TrendingUp, AlertTriangle, CheckCircle, XCircle } from "lucide-react"
 import type { Language } from "@/app/page"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/animate-ui/components/tooltip"
 
@@ -29,6 +29,9 @@ const translations = {
     profitTarget: "Profit target reached for EURUSD",
     riskLimit: "Daily loss limit approaching",
     botStarted: "Trading bot started successfully",
+    tradeOpened: "Trade opened",
+    tradeResultWin: "Trade closed: WIN",
+    tradeResultLoss: "Trade closed: LOSS",
   },
   es: {
     notifications: "Notificaciones",
@@ -40,6 +43,9 @@ const translations = {
     profitTarget: "Objetivo de ganancia alcanzado para EURUSD",
     riskLimit: "Límite de pérdida diaria acercándose",
     botStarted: "Bot de trading iniciado exitosamente",
+    tradeOpened: "Operación abierta",
+    tradeResultWin: "Operación cerrada: GANADA",
+    tradeResultLoss: "Operación cerrada: PERDIDA",
   },
 }
 
@@ -69,6 +75,30 @@ export function NotificationBell({ language, tooltipSide = "top" }: Notification
       time: "10m ago",
       read: true,
     },
+    {
+      id: 4,
+      type: "info",
+      title: translations[language].tradingAlert,
+      message: translations[language].tradeOpened + " (EURUSD)",
+      time: "Just now",
+      read: false,
+    },
+    {
+      id: 5,
+      type: "success",
+      title: translations[language].tradingAlert,
+      message: translations[language].tradeResultWin + " (EURUSD)",
+      time: "Just now",
+      read: false,
+    },
+    {
+      id: 6,
+      type: "loss",
+      title: translations[language].tradingAlert,
+      message: translations[language].tradeResultLoss + " (EURUSD)",
+      time: "Just now",
+      read: false,
+    },
   ])
 
   const t = translations[language]
@@ -82,6 +112,8 @@ export function NotificationBell({ language, tooltipSide = "top" }: Notification
         return <AlertTriangle className="h-4 w-4 text-yellow-500" />
       case "info":
         return <TrendingUp className="h-4 w-4 text-blue-500" />
+      case "loss":
+        return <XCircle className="h-4 w-4 text-red-500" />
       default:
         return <Bell className="h-4 w-4" />
     }

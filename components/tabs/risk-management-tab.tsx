@@ -21,7 +21,7 @@ const translations = {
     maxWinningTrades: "Maximum Winning Trades",
     stopAfterWins: "Stop after {count} wins",
     targetPerTrade: "Target per Trade",
-    perTrade: "${amount} per trade",
+    generalTarget: "${amount} de objetivo general",
     maxDailyLoss: "Maximum Daily Loss",
     stopAtLoss: "Stop at -${amount}",
     riskSummary: "Risk Management Summary",
@@ -50,7 +50,7 @@ const translations = {
     maxWinningTrades: "Máximo de Operaciones Ganadoras",
     stopAfterWins: "Parar después de {count} ganancias",
     targetPerTrade: "Objetivo por Operación",
-    perTrade: "${amount} por operación",
+    generalTarget: "${amount} de objetivo general",
     maxDailyLoss: "Máxima Pérdida Diaria",
     stopAtLoss: "Parar en -${amount}",
     riskSummary: "Resumen de Gestión de Riesgo",
@@ -81,6 +81,7 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
   setMaxDailyLoss: (v: number[]) => void;
 }) {
   const t = translations[language]
+  const [profitPercentPerTrade, setProfitPercentPerTrade] = useState<number[]>([50]) // Nuevo valor inicial 50
 
   return (
     <div className="space-y-6">
@@ -96,7 +97,7 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>
-                {t.targetPerTrade}: ${profitTarget[0]}
+                {t.profitTarget}: ${profitTarget[0]}
               </Label>
               <Slider
                 value={profitTarget}
@@ -108,7 +109,35 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
               />
             </div>
             <Badge variant="outline" className="w-full justify-center">
-              {t.perTrade.replace("{amount}", profitTarget[0].toString())}
+              {t.generalTarget.replace("{amount}", profitTarget[0].toString())}
+            </Badge>
+          </CardContent>
+        </Card>
+
+        {/* Porcentaje de ganancia por trade */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Target className="h-5 w-5 text-green-500" />
+              {language === "es" ? "Ganancia por Trade" : "Profit per Trade"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>
+                {language === "es" ? "Porcentaje deseado por operación" : "Desired percent per trade"}: {profitPercentPerTrade[0]}%
+              </Label>
+              <Slider
+                value={profitPercentPerTrade}
+                onValueChange={setProfitPercentPerTrade}
+                max={99}
+                min={50}
+                step={1}
+                className="w-full"
+              />
+            </div>
+            <Badge variant="outline" className="w-full justify-center">
+              {profitPercentPerTrade[0]}% {language === "es" ? "de ganancia por operación" : "profit per trade"}
             </Badge>
           </CardContent>
         </Card>
@@ -140,33 +169,8 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
             </Badge>
           </CardContent>
         </Card>
-      </motion.div>
 
-      {/* Barra de progreso visual de riesgo */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <Card>
-          <CardHeader>
-            <CardTitle>{t.riskProgress}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-2 items-center">
-              <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-4 overflow-hidden">
-                <div
-                  className="bg-red-500 h-4 rounded-full transition-all"
-                  style={{ width: `${Math.min((profitTarget[0] / maxDailyLoss[0]) * 100, 100)}%` }}
-                />
-              </div>
-              <div className="flex justify-between w-full text-xs text-muted-foreground mt-1">
-                <span>{t.objective}: ${profitTarget[0]}</span>
-                <span>{t.lossLimit}: ${maxDailyLoss[0]}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Checklist de buenas prácticas */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        {/* Checklist de buenas prácticas */}
         <Card>
           <CardHeader>
             <CardTitle>{t.checklistTitle}</CardTitle>

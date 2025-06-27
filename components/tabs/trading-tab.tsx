@@ -189,6 +189,7 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
   const [useEconomicNews, setUseEconomicNews] = useState(false)
   const [telegramBot, setTelegramBot] = useState("")
   const [telegramChat, setTelegramChat] = useState("")
+  const [useTechnicalIndicators, setUseTechnicalIndicators] = useState(false)
 
   // Simulación de saldo (reemplazar por prop o contexto real)
   const balance = 10; // <-- Cambia esto por el valor real de saldo
@@ -455,7 +456,23 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
               />
             </div>
 
-            {(useMarketSentiment || useEconomicNews) && (
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-foreground dark:text-foreground">{language === "es" ? "Integración de Indicadores Técnicos" : "Technical Indicators Integration"}</Label>
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                  {language === "es"
+                    ? "Activa el uso de indicadores técnicos como RSI, MACD, etc. para mejorar la precisión."
+                    : "Enable the use of technical indicators like RSI, MACD, etc. to improve precision."}
+                </p>
+              </div>
+              <Switch
+                checked={useTechnicalIndicators}
+                onCheckedChange={setUseTechnicalIndicators}
+                className="data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary"
+              />
+            </div>
+
+            {(useMarketSentiment || useEconomicNews || useTechnicalIndicators) && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2">
                 {useMarketSentiment && (
                   <Badge
@@ -471,6 +488,14 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                     className="bg-secondary dark:bg-secondary text-secondary-foreground dark:text-secondary-foreground"
                   >
                     Economic News
+                  </Badge>
+                )}
+                {useTechnicalIndicators && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-secondary dark:bg-secondary text-secondary-foreground dark:text-secondary-foreground"
+                  >
+                    Indicators
                   </Badge>
                 )}
               </motion.div>
