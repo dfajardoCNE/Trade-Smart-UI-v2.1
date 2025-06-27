@@ -10,13 +10,12 @@ import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Info, DollarSign, Clock, BarChart3, TrendingUp } from "lucide-react"
+import { Info, DollarSign, Clock, BarChart3 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/animate-ui/components/tooltip"
 import { CurrencyPairAvatar } from "@/components/ui/currency-pair-avatar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { Language } from "@/app/page"
+import "/node_modules/flag-icons/css/flag-icons.min.css";
 
 interface TradingTabProps {
   language: Language
@@ -166,16 +165,66 @@ const translations = {
 }
 
 const currencyPairs = [
-  { id: "EURUSD", name: "EUR/USD", flag: "🇪🇺🇺🇸" },
-  { id: "GBPUSD", name: "GBP/USD", flag: "🇬🇧🇺🇸" },
-  { id: "USDJPY", name: "USD/JPY", flag: "🇺🇸🇯🇵" },
-  { id: "USDCHF", name: "USD/CHF", flag: "🇺🇸🇨🇭" },
-  { id: "AUDUSD", name: "AUD/USD", flag: "🇦🇺🇺🇸" },
-  { id: "USDCAD", name: "USD/CAD", flag: "🇺🇸🇨🇦" },
-  { id: "NZDUSD", name: "NZD/USD", flag: "🇳🇿🇺🇸" },
-  { id: "EURGBP", name: "EUR/GBP", flag: "🇪🇺🇬🇧" },
-  { id: "EURJPY", name: "EUR/JPY", flag: "🇪🇺🇯🇵" },
-  { id: "GBPJPY", name: "GBP/JPY", flag: "🇬🇧🇯🇵" },
+  {
+    id: "EURUSD",
+    name: "EUR/USD",
+    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "GBPUSD",
+    name: "GBP/USD",
+    flag1: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "USDJPY",
+    name: "USD/JPY",
+    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "USDCHF",
+    name: "USD/CHF",
+    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-ch rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "AUDUSD",
+    name: "AUD/USD",
+    flag1: <span className="fi fi-au rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "USDCAD",
+    name: "USD/CAD",
+    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-ca rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "NZDUSD",
+    name: "NZD/USD",
+    flag1: <span className="fi fi-nz rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "EURGBP",
+    name: "EUR/GBP",
+    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "EURJPY",
+    name: "EUR/JPY",
+    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
+  {
+    id: "GBPJPY",
+    name: "GBP/JPY",
+    flag1: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
+    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+  },
 ]
 
 export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProps & { canStartBot?: boolean; onStartBot?: () => void }) {
@@ -339,16 +388,31 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                     {currencyPairs.map((pair) => (
                       <DropdownMenuCheckboxItem
                         key={pair.id}
-                        checked={selectedPairs.includes(pair.id)}
                         onCheckedChange={() => handlePairToggle(pair.id)}
-                        className="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer text-foreground dark:text-foreground focus:bg-accent dark:focus:bg-accent"
+                        className="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer text-foreground dark:text-foreground focus:bg-accent dark:focus:bg-accent justify-between"
                       >
-                        <CurrencyPairAvatar
-                          flag1={pair.flag.slice(0, 2)}
-                          flag2={pair.flag.slice(2, 4)}
-                          pair={pair.name}
-                          compact={true}
-                        />
+                        {/* Banderas */}
+                        <span className="flex items-center mr-4">
+                          <span className="w-6 h-6 rounded-full border shadow bg-white flex items-center justify-center overflow-hidden">
+                            <span className="w-full h-full object-cover flex items-center justify-center">{pair.flag1}</span>
+                          </span>
+                          <span className="w-6 h-6 rounded-full border shadow bg-white flex items-center justify-center overflow-hidden -ml-2 z-10 translate-y-1">
+                            <span className="w-full h-full object-cover flex items-center justify-center">{pair.flag2}</span>
+                          </span>
+                        </span>
+                        {/* Nombre del par */}
+                        <span className="flex-1">{pair.name}</span>
+                        {/* Checkbox visual a la derecha */}
+                        <span className="ml-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedPairs.includes(pair.id)}
+                            readOnly
+                            className="accent-primary w-4 h-4 cursor-pointer"
+                            tabIndex={-1}
+                            style={{ pointerEvents: 'none' }}
+                          />
+                        </span>
                       </DropdownMenuCheckboxItem>
                     ))}
                   </DropdownMenuContent>

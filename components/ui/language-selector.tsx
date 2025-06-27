@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Languages } from "lucide-react"
 import type { Language } from "@/app/page"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/animate-ui/components/tooltip"
+import "/node_modules/flag-icons/css/flag-icons.min.css";
 
 interface LanguageSelectorProps {
   currentLanguage: Language
@@ -12,8 +13,8 @@ interface LanguageSelectorProps {
 }
 
 const languages = {
-  en: { name: "English", flag: "🇺🇸" },
-  es: { name: "Español", flag: "🇪🇸" },
+  en: { name: "English", flag: <span className="fi fi-us"></span> },
+  es: { name: "Español", flag: <span className="fi fi-es"></span> },
 }
 
 export function LanguageSelector({ currentLanguage, onLanguageChange, tooltipSide = "top" }: LanguageSelectorProps & { tooltipSide?: "top" | "bottom" | "left" | "right" }) {
