@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { montserrat } from '../styles/montserrat-font'
+import { AppFooter } from '@/components/ui/app-footer'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'TradeSmart',
+  description: 'A smart trading platform for modern traders',
+  generator: 'TradeSmart',
 }
 
 export default function RootLayout({
@@ -15,7 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={montserrat.variable}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        {children}
+        <AppFooter />
+      </body>
     </html>
   )
 }
