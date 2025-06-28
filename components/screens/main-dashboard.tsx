@@ -17,6 +17,8 @@ import { NotificationBell } from "@/components/ui/notification-bell"
 import { Badge } from "@/components/ui/badge"
 import { FloatingExecutionBot } from "@/components/ui/floating-execution-bot"
 import { AccountTypeDropdown } from "@/components/ui/account-type-dropdown"
+import { useTradingTabValidation } from "@/hooks/use-trading-tab-validation"
+import { AppFooter } from "@/components/ui/app-footer"
 
 interface MainDashboardProps {
   userData: UserData
@@ -69,73 +71,17 @@ export function MainDashboard({
   onAccountTypeChange,
   onLanguageChange,
   onThemeChange,
-}: Omit<MainDashboardProps, 'onBack'>) {
-  // Leer idioma y tema de localStorage si existen, si no usar los props
-  const [language, setLanguage] = useState<Language>(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("language") as Language) || initialLanguage
-    }
-    return initialLanguage
-  })
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("theme") as Theme) || initialTheme
-    }
-    return initialTheme
-  })
+}: MainDashboardProps) {
   const [activeTab, setActiveTab] = useState("trading")
   const [profitTarget, setProfitTarget] = useState<number[]>([100])
   const [maxDailyLoss, setMaxDailyLoss] = useState<number[]>([10])
-  const t = translations[language]
+  const t = translations[initialLanguage]
 
-  // Guardar en localStorage cuando cambian
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("language", language)
-    }
-  }, [language])
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("theme", theme)
-    }
-  }, [theme])
-
-  // Aplica la clase de tema globalmente al <html> cuando cambia el tema
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.documentElement.classList.remove("light", "dark")
-      document.documentElement.classList.add(theme)
-    }
-  }, [theme])
-
-  // Sincronizar localStorage con el padre al montar (solo si hay diferencia)
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedLang = localStorage.getItem("language") as Language | null
-      if (storedLang && storedLang !== initialLanguage) {
-        onLanguageChange(storedLang)
-      }
-      const storedTheme = localStorage.getItem("theme") as Theme | null
-      if (storedTheme && storedTheme !== initialTheme) {
-        onThemeChange(storedTheme)
-      }
-    }
-    // Solo en el primer render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Setters que actualizan localStorage y llaman a los callbacks externos
   const handleLanguageChange = (lang: Language) => {
-    setLanguage(lang)
     onLanguageChange(lang)
   }
   const handleThemeChange = (th: Theme) => {
-    setTheme(th)
     onThemeChange(th)
-    if (typeof window !== "undefined") {
-      document.documentElement.classList.remove("light", "dark")
-      document.documentElement.classList.add(th)
-    }
   }
 
   const handleStartBot = () => {
@@ -175,14 +121,16 @@ export function MainDashboard({
       : "text-orange-600 dark:text-orange-400"
   }
 
+  const canStartBot = useTradingTabValidation();
+
   return (
     <TooltipProvider>
-      <div className="min-h-screen flex flex-col">
+      <div className="h-screen flex flex-col">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card dark:bg-card border-b border-border dark:border-border shadow-sm"
+          className="fixed top-0 left-0 w-full bg-card dark:bg-card border-b border-border dark:border-border shadow-sm z-30 pb-4"
         >
           <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
@@ -192,7 +140,7 @@ export function MainDashboard({
                   userData={userData}
                   onAccountTypeChange={onAccountTypeChange}
                   onLogout={onLogout}
-                  language={language}
+                  language={initialLanguage}
                 />
               </div>
 
@@ -202,15 +150,15 @@ export function MainDashboard({
                   <AccountTypeDropdown
                     accountType={userData.accountType}
                     balance={userData.balance}
-                    language={language}
+                    language={initialLanguage}
                     onChange={onAccountTypeChange}
                   />
                 </div>
                 {/* Controls */}
                 <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-center mt-2 sm:mt-0">
-                  <NotificationBell language={language} tooltipSide="bottom" />
-                  <LanguageSelector currentLanguage={language} onLanguageChange={handleLanguageChange} tooltipSide="bottom" />
-                  <ThemeToggle currentTheme={theme} onThemeChange={handleThemeChange} tooltipSide="bottom" />
+                  <NotificationBell language={initialLanguage} tooltipSide="bottom" />
+                  <LanguageSelector currentLanguage={initialLanguage} onLanguageChange={handleLanguageChange} tooltipSide="bottom" />
+                  <ThemeToggle currentTheme={initialTheme} onThemeChange={handleThemeChange} tooltipSide="bottom" />
                 </div>
               </div>
             </div>
@@ -218,7 +166,7 @@ export function MainDashboard({
         </motion.header>
 
         {/* Main Content */}
-        <main className="flex-1 container mx-auto px-4 py-6 pb-32 relative">
+        <main className="container mx-auto px-4 pt-[110px] pb-[160px] relative h-[calc(100vh-30px)] overflow-y-auto ">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
@@ -228,12 +176,12 @@ export function MainDashboard({
               </TabsList>
 
               <TabsContent value="trading">
-                <TradingTab language={language} />
+                <TradingTab language={initialLanguage} />
               </TabsContent>
 
               <TabsContent value="risk">
                 <RiskManagementTab
-                  language={language}
+                  language={initialLanguage}
                   profitTarget={profitTarget}
                   setProfitTarget={setProfitTarget}
                   maxDailyLoss={maxDailyLoss}
@@ -242,7 +190,7 @@ export function MainDashboard({
               </TabsContent>
 
               <TabsContent value="martingale">
-                <MartingaleTab language={language} />
+                <MartingaleTab language={initialLanguage} />
               </TabsContent>
             </Tabs>
             <FloatingExecutionBot
@@ -252,9 +200,11 @@ export function MainDashboard({
               onStart={handleStartBot}
               onStop={handleStopBot}
               t={t}
+              canStart={canStartBot}
             />
           </motion.div>
         </main>
+        <AppFooter className="fixed bottom-0 left-0 right-0 z-40" language={initialLanguage} />
       </div>
     </TooltipProvider>
   )

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { montserrat } from '../styles/montserrat-font'
-import { AppFooter } from '@/components/ui/app-footer'
 
 export const metadata: Metadata = {
   title: 'TradeSmart',
@@ -15,10 +14,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={montserrat.variable}>
-      <body className="font-sans">
+    <html lang="en" className={`${montserrat.variable} h-full overflow-hidden`}>
+      <body className="font-sans h-full overflow-hidden">
         {children}
-        <AppFooter />
       </body>
     </html>
   )

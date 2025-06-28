@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "motion/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -16,9 +16,25 @@ import { CurrencyPairAvatar } from "@/components/ui/currency-pair-avatar"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { Language } from "@/app/page"
 import "/node_modules/flag-icons/css/flag-icons.min.css";
+import { currencyPairs } from "@/lib/constants/currency-pairs";
 
 interface TradingTabProps {
   language: Language
+}
+
+// Definir tipo para el estado
+interface TradingTabState {
+  strategy: string;
+  confidence: number[];
+  investmentAmount: string;
+  expirationTime: string;
+  candleInterval: string;
+  selectedPairs: string[];
+  useMarketSentiment: boolean;
+  useEconomicNews: boolean;
+  telegramBot: string;
+  telegramChat: string;
+  useTechnicalIndicators: boolean;
 }
 
 const translations = {
@@ -164,113 +180,128 @@ const translations = {
   },
 }
 
-const currencyPairs = [
-  {
-    id: "EURUSD",
-    name: "EUR/USD",
-    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "GBPUSD",
-    name: "GBP/USD",
-    flag1: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "USDJPY",
-    name: "USD/JPY",
-    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "USDCHF",
-    name: "USD/CHF",
-    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-ch rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "AUDUSD",
-    name: "AUD/USD",
-    flag1: <span className="fi fi-au rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "USDCAD",
-    name: "USD/CAD",
-    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-ca rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "NZDUSD",
-    name: "NZD/USD",
-    flag1: <span className="fi fi-nz rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "EURGBP",
-    name: "EUR/GBP",
-    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "EURJPY",
-    name: "EUR/JPY",
-    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-  {
-    id: "GBPJPY",
-    name: "GBP/JPY",
-    flag1: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
-    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
-  },
-]
+// Helpers para localStorage con objeto único
+function getTradingTabState() {
+  if (typeof window === "undefined") return null;
+  try {
+    const val = localStorage.getItem("tradingTab_state");
+    if (!val) return null;
+    return JSON.parse(val);
+  } catch {
+    return null;
+  }
+}
+function setTradingTabState(newState: any) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("tradingTab_state", JSON.stringify(newState));
+  } catch {}
+}
 
-export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProps & { canStartBot?: boolean; onStartBot?: () => void }) {
-  const [strategy, setStrategy] = useState("")
-  const [confidence, setConfidence] = useState([75])
-  const [investmentAmount, setInvestmentAmount] = useState("10")
-  const [expirationTime, setExpirationTime] = useState("")
-  const [candleInterval, setCandleInterval] = useState("")
-  const [selectedPairs, setSelectedPairs] = useState<string[]>(["EURUSD", "GBPUSD"])
-  const [useMarketSentiment, setUseMarketSentiment] = useState(false)
-  const [useEconomicNews, setUseEconomicNews] = useState(false)
-  const [telegramBot, setTelegramBot] = useState("")
-  const [telegramChat, setTelegramChat] = useState("")
-  const [useTechnicalIndicators, setUseTechnicalIndicators] = useState(false)
+// Helpers para otros tabs
+function getRiskManagementTabState() {
+  if (typeof window === "undefined") return null;
+  try {
+    const val = localStorage.getItem("riskManagementTab_state");
+    if (!val) return null;
+    return JSON.parse(val);
+  } catch {
+    return null;
+  }
+}
+function getMartingaleTabState() {
+  if (typeof window === "undefined") return null;
+  try {
+    const val = localStorage.getItem("martingaleTab_state");
+    if (!val) return null;
+    return JSON.parse(val);
+  } catch {
+    return null;
+  }
+}
 
-  // Simulación de saldo (reemplazar por prop o contexto real)
-  const balance = 10; // <-- Cambia esto por el valor real de saldo
+// Default values
+const defaultState: TradingTabState = {
+  strategy: "",
+  confidence: [75], // Valor por defecto para el slider
+  investmentAmount: "",
+  expirationTime: "",
+  candleInterval: "",
+  selectedPairs: [],
+  useMarketSentiment: false,
+  useEconomicNews: false,
+  telegramBot: "",
+  telegramChat: "",
+  useTechnicalIndicators: false
+};
 
-  // Validaciones
-  const investment = parseFloat(investmentAmount);
-  const isInvestmentValid = !isNaN(investment) && investment >= 1;
-  const isExpirationValid = !!expirationTime;
-  const isIntervalValid = !!candleInterval;
-  const isPairsValid = selectedPairs.length > 0;
-  const isStrategyValid = !!strategy;
-  const hasBalance = balance > 0;
+const initialState: TradingTabState = typeof window !== "undefined" && getTradingTabState() ? getTradingTabState() : defaultState;
 
-  const canStartBotLocal = hasBalance && isInvestmentValid && isExpirationValid && isIntervalValid && isPairsValid && isStrategyValid;
+export function TradingTab({ language }: TradingTabProps) {
+  const t = translations[language];
 
-  const t = translations[language]
-  const selectedStrategy = strategy ? t.strategies[strategy as keyof typeof t.strategies] : null
+  // Estado persistente
+  const [state, setState] = useState<TradingTabState>(() => {
+    if (typeof window !== "undefined") {
+      const saved = getTradingTabState();
+      return saved || {
+        strategy: "trend-following",
+        confidence: [75],
+        investmentAmount: "10",
+        expirationTime: "1m",
+        candleInterval: "1m",
+        selectedPairs: [],
+        useMarketSentiment: false,
+        useEconomicNews: false,
+        telegramBot: "",
+        telegramChat: "",
+        useTechnicalIndicators: false,
+      };
+    }
+    return defaultState;
+  });
+
+  // Effect to save state to localStorage and dispatch event on state change
+  useEffect(() => {
+    setTradingTabState(state); // Save to localStorage
+    // Dispatch custom event with the current state
+    window.dispatchEvent(new CustomEvent('tradingTabStateChanged', { detail: state }));
+  }, [state]); // Re-run whenever the state object changes
+
+  // Leer siempre el estado más reciente de localStorage al montar y cuando cambie la clave desde otra pestaña
+  useEffect(() => {
+    function syncFromStorage() {
+      const latest = getTradingTabState();
+      if (latest) setState(latest);
+    }
+    window.addEventListener("storage", syncFromStorage);
+    syncFromStorage(); // Initial sync on mount
+    return () => {
+      window.removeEventListener("storage", syncFromStorage);
+    };
+  }, []);
 
   const handlePairToggle = (pairId: string) => {
-    setSelectedPairs((prev) => (prev.includes(pairId) ? prev.filter((id) => id !== pairId) : [...prev, pairId]))
-  }
+    setState((prev) => {
+      const newSelectedPairs = prev.selectedPairs.includes(pairId)
+        ? prev.selectedPairs.filter((id) => id !== pairId)
+        : [...prev.selectedPairs, pairId];
+      return { ...prev, selectedPairs: newSelectedPairs };
+    });
+  };
 
   const handleSelectAll = () => {
-    setSelectedPairs(currencyPairs.map((pair) => pair.id))
-  }
+    setState((prev) => ({
+      ...prev,
+      selectedPairs: currencyPairs.map((pair) => pair.id),
+    }));
+  };
 
   const handleDeselectAll = () => {
-    setSelectedPairs([])
-  }
+    setState((prev) => ({ ...prev, selectedPairs: [] }));
+  };
 
-  // Usar canStartBot si viene por prop, si no usar el local
-  const canStart = typeof canStartBot === "boolean" ? canStartBot : canStartBotLocal;
+  const selectedStrategy = state.strategy ? t.strategies[state.strategy as keyof typeof t.strategies] : null
 
   return (
     <div className="space-y-6">
@@ -294,24 +325,18 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                   min={1}
                   step={1}
                   placeholder="10"
-                  value={investmentAmount}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/[^\d.]/g, "");
-                    setInvestmentAmount(val.startsWith("-") ? val.slice(1) : val);
-                  }}
+                  value={state.investmentAmount}
+                  onChange={(e) => setState(s => ({...s, investmentAmount: e.target.value}))}
                   className="pl-9 bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input"
                 />
               </div>
-              {!isInvestmentValid && (
-                <p className="text-xs text-red-500">{language === "en" ? "Minimum investment is $1" : "La inversión mínima es $1"}</p>
-              )}
               <p className="text-xs text-muted-foreground dark:text-muted-foreground">{t.investmentAmountDesc}</p>
             </div>
 
             {/* Expiration Time */}
             <div className="space-y-2">
               <Label className="text-foreground dark:text-foreground">{t.expirationTime}</Label>
-              <Select value={expirationTime} onValueChange={setExpirationTime}>
+              <Select value={state.expirationTime} onValueChange={v => setState(s => ({...s, expirationTime: v}))}>
                 <SelectTrigger className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input">
                   <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
                   <SelectValue placeholder={language === "en" ? "Select time..." : "Seleccionar tiempo..."} />
@@ -324,16 +349,13 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                   ))}
                 </SelectContent>
               </Select>
-              {!isExpirationValid && (
-                <p className="text-xs text-red-500">{language === "en" ? "Expiration time is required" : "El tiempo de expiración es obligatorio"}</p>
-              )}
               <p className="text-xs text-muted-foreground dark:text-muted-foreground">{t.expirationTimeDesc}</p>
             </div>
 
             {/* Candle Interval */}
             <div className="space-y-2">
               <Label className="text-foreground dark:text-foreground">{t.candleInterval}</Label>
-              <Select value={candleInterval} onValueChange={setCandleInterval}>
+              <Select value={state.candleInterval} onValueChange={v => setState(s => ({...s, candleInterval: v}))}>
                 <SelectTrigger className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input">
                   <BarChart3 className="h-4 w-4 mr-2 text-muted-foreground" />
                   <SelectValue placeholder={language === "en" ? "Select interval..." : "Seleccionar intervalo..."} />
@@ -346,9 +368,6 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                   ))}
                 </SelectContent>
               </Select>
-              {!isIntervalValid && (
-                <p className="text-xs text-red-500">{language === "en" ? "Candle interval is required" : "El intervalo de vela es obligatorio"}</p>
-              )}
               <p className="text-xs text-muted-foreground dark:text-muted-foreground">{t.candleIntervalDesc}</p>
             </div>
             {/* Selected Pairs Count & Dropdown */}
@@ -362,7 +381,7 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                       className="w-full justify-between bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input hover:bg-accent dark:hover:bg-accent"
                     >
                       <span>
-                        {selectedPairs.length} {language === "en" ? "pairs selected" : "pares seleccionados"}
+                        {state.selectedPairs.length} {language === "en" ? "pairs selected" : "pares seleccionados"}
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
@@ -406,7 +425,7 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                         <span className="ml-2">
                           <input
                             type="checkbox"
-                            checked={selectedPairs.includes(pair.id)}
+                            checked={state.selectedPairs.includes(pair.id)}
                             readOnly
                             className="accent-primary w-4 h-4 cursor-pointer"
                             tabIndex={-1}
@@ -418,9 +437,6 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              {!isPairsValid && (
-                <p className="text-xs text-red-500">{language === "en" ? "Select at least one pair" : "Selecciona al menos un par"}</p>
-              )}
               <p className="text-xs text-muted-foreground dark:text-muted-foreground">{t.currencyPairsDesc}</p>
             </div>
           </CardContent>
@@ -451,7 +467,7 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label className="text-foreground dark:text-foreground">{t.strategyType}</Label>
-              <Select value={strategy} onValueChange={setStrategy}>
+              <Select value={state.strategy} onValueChange={v => setState(s => ({...s, strategy: v}))}>
                 <SelectTrigger className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input">
                   <SelectValue placeholder={t.chooseStrategy} />
                 </SelectTrigger>
@@ -463,9 +479,6 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                   ))}
                 </SelectContent>
               </Select>
-              {!isStrategyValid && (
-                <p className="text-xs text-red-500">{language === "en" ? "Strategy is required" : "La estrategia es obligatoria"}</p>
-              )}
             </div>
 
             {selectedStrategy && (
@@ -482,9 +495,9 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
 
             <div className="space-y-2">
               <Label className="text-foreground dark:text-foreground">
-                {t.confidenceThreshold}: {confidence[0]}%
+                {t.confidenceThreshold}: {state.confidence[0]}%
               </Label>
-              <Slider value={confidence} onValueChange={setConfidence} max={100} min={50} step={5} className="w-full" />
+              <Slider value={state.confidence} onValueChange={v => setState(s => ({...s, confidence: v}))} max={100} min={50} step={5} className="w-full" />
               <p className="text-xs text-muted-foreground dark:text-muted-foreground">{t.confidenceDescription}</p>
             </div>
           </CardContent>
@@ -502,8 +515,8 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                 <p className="text-xs text-muted-foreground dark:text-muted-foreground">{t.marketSentimentDesc}</p>
               </div>
               <Switch
-                checked={useMarketSentiment}
-                onCheckedChange={setUseMarketSentiment}
+                checked={state.useMarketSentiment}
+                onCheckedChange={v => setState(s => ({...s, useMarketSentiment: v}))}
                 className="data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary"
               />
             </div>
@@ -514,8 +527,8 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                 <p className="text-xs text-muted-foreground dark:text-muted-foreground">{t.economicNewsDesc}</p>
               </div>
               <Switch
-                checked={useEconomicNews}
-                onCheckedChange={setUseEconomicNews}
+                checked={state.useEconomicNews}
+                onCheckedChange={v => setState(s => ({...s, useEconomicNews: v}))}
                 className="data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary"
               />
             </div>
@@ -530,15 +543,15 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                 </p>
               </div>
               <Switch
-                checked={useTechnicalIndicators}
-                onCheckedChange={setUseTechnicalIndicators}
+                checked={state.useTechnicalIndicators}
+                onCheckedChange={v => setState(s => ({...s, useTechnicalIndicators: v}))}
                 className="data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary"
               />
             </div>
 
-            {(useMarketSentiment || useEconomicNews || useTechnicalIndicators) && (
+            {(state.useMarketSentiment || state.useEconomicNews || state.useTechnicalIndicators) && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2">
-                {useMarketSentiment && (
+                {state.useMarketSentiment && (
                   <Badge
                     variant="secondary"
                     className="bg-secondary dark:bg-secondary text-secondary-foreground dark:text-secondary-foreground"
@@ -546,7 +559,7 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                     Sentiment
                   </Badge>
                 )}
-                {useEconomicNews && (
+                {state.useEconomicNews && (
                   <Badge
                     variant="secondary"
                     className="bg-secondary dark:bg-secondary text-secondary-foreground dark:text-secondary-foreground"
@@ -554,7 +567,7 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                     Economic News
                   </Badge>
                 )}
-                {useTechnicalIndicators && (
+                {state.useTechnicalIndicators && (
                   <Badge
                     variant="secondary"
                     className="bg-secondary dark:bg-secondary text-secondary-foreground dark:text-secondary-foreground"
@@ -584,8 +597,8 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                   id="telegram-bot"
                   type="password"
                   placeholder={`${language === "en" ? "Enter your Telegram bot token" : "Ingresa tu token del bot de Telegram"}`}
-                  value={telegramBot}
-                  onChange={(e) => setTelegramBot(e.target.value)}
+                  value={state.telegramBot}
+                  onChange={(e) => setState(s => ({...s, telegramBot: e.target.value}))}
                   className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input"
                 />
               </div>
@@ -596,8 +609,8 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                 <Input
                   id="telegram-chat"
                   placeholder={`${language === "en" ? "Enter your Telegram chat ID" : "Ingresa tu ID de chat de Telegram"}`}
-                  value={telegramChat}
-                  onChange={(e) => setTelegramChat(e.target.value)}
+                  value={state.telegramChat}
+                  onChange={(e) => setState(s => ({...s, telegramChat: e.target.value}))}
                   className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input"
                 />
               </div>
@@ -606,18 +619,6 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
           </CardContent>
         </Card>
       </motion.div>
-
-      {/* Botón para iniciar bot (eliminado, usar FloatingExecutionBot) */}
-      {/* <div className="flex justify-end">
-        <Button
-          variant="default"
-          size="lg"
-          disabled={!canStartBot}
-          className="mt-2"
-        >
-          {language === "en" ? "Start Bot" : "Iniciar Bot"}
-        </Button>
-      </div> */}
     </div>
   )
 }

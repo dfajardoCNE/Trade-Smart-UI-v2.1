@@ -5,6 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Play, Square, Activity } from "lucide-react"
 import type { BotStatus } from "@/app/page"
 
+interface TradingTabState {
+  investmentAmount: string;
+  expirationTime: string;
+  candleInterval: string;
+  selectedPairs: string[];
+  strategy: string;
+  confidence: [number, number];
+}
+
 interface FloatingExecutionBotProps {
   botStatus: BotStatus
   getBotStatusColor: () => string
@@ -12,6 +21,7 @@ interface FloatingExecutionBotProps {
   onStart: () => void
   onStop: () => void
   t: { startBot: string; stopBot: string }
+  canStart: boolean // Nueva prop para validación de campos obligatorios
 }
 
 export function FloatingExecutionBot({
@@ -21,6 +31,7 @@ export function FloatingExecutionBot({
   onStart,
   onStop,
   t,
+  canStart,
 }: FloatingExecutionBotProps) {
   return (
     <div className="fixed left-0 right-0 bottom-0 w-full flex justify-center items-end pointer-events-none z-40 pb-24 sm:pb-24">
@@ -51,7 +62,7 @@ export function FloatingExecutionBot({
               variant="default"
               size="sm"
               onClick={onStart}
-              disabled={botStatus === "running" || botStatus === "connecting"}
+              disabled={!canStart || botStatus === "running" || botStatus === "connecting"}
               className="flex items-center gap-2 w-full sm:w-auto"
             >
               <Play className="h-4 w-4" />

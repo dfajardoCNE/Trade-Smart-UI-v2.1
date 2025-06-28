@@ -98,22 +98,31 @@ body {
   }
 }
 
-/* Custom scrollbar for dark mode */
-.dark ::-webkit-scrollbar {
-  width: 8px;
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
 }
 
-.dark ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground));
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0); /* Semi-transparent black for light mode */
   border-radius: 4px;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0); /* Slightly darker on hover */
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0); /* Semi-transparent white for dark mode */
+}
+
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--accent-foreground));
+  background-color: rgba(255, 255, 255, 0); /* Slightly darker on hover in dark mode */
 }
 
 /* Ensure proper dark mode transitions */

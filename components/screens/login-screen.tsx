@@ -40,8 +40,8 @@ export function LoginScreen({ broker, onLogin, onBack }: LoginScreenProps) {
 
     // Mock successful login
     const userData: UserData = {
-      username: credentials.username || "demo_user",
-      email: credentials.email || "demo@example.com",
+      username: credentials.username,
+      email: credentials.email,
       accountType: "PRACTICE",
       balance: 10000,
       broker,
@@ -85,6 +85,17 @@ export function LoginScreen({ broker, onLogin, onBack }: LoginScreenProps) {
             <form onSubmit={handleSubmit} className="space-y-4">
               {!useApiKey ? (
                 <>
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="Enter your username"
+                      value={credentials.username}
+                      onChange={(e) => setCredentials((prev) => ({ ...prev, username: e.target.value }))}
+                      required
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input

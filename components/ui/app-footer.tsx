@@ -1,6 +1,6 @@
 import React from "react"
 
-export function AppFooter({ language = "es" }: { language?: "es" | "en" }) {
+export function AppFooter({ language = "es", className }: { language?: "es" | "en", className?: string }) {
   const t = {
     es: {
       copyright: "© 2025 Tu Plataforma de Trading Automatizado. Todos los derechos reservados.",
@@ -13,7 +13,7 @@ export function AppFooter({ language = "es" }: { language?: "es" | "en" }) {
   }[language]
 
   return (
-    <footer className="w-full bg-card dark:bg-card border-t border-border dark:border-border py-4 text-center text-xs text-muted-foreground">
+    <footer className={`w-full bg-card dark:bg-card border-t border-border dark:border-border py-4 text-center text-xs text-muted-foreground ${className}`}>
       <div>{t.copyright}</div>
       <div className="mt-1">{t.made}</div>
     </footer>

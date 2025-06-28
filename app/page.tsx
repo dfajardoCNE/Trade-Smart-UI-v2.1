@@ -6,12 +6,37 @@ import type { Transition } from "motion"
 import { BrokerSelectionScreen } from "@/components/screens/broker-selection-screen"
 import { LoginScreen } from "@/components/screens/login-screen"
 import { MainDashboard } from "@/components/screens/main-dashboard"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export type Broker = "iq-option" | "tradingview"
 export type AccountType = "REAL" | "PRACTICE"
 export type BotStatus = "stopped" | "running" | "connecting"
 export type Language = "en" | "es"
 export type Theme = "light" | "dark"
+
+const isValidLanguage = (lang: string | null): lang is Language => {
+  return lang === "en" || lang === "es";
+};
+
+const getInitialLanguage = (): Language => {
+  if (typeof window !== "undefined") {
+    const storedLang = localStorage.getItem("language");
+    if (isValidLanguage(storedLang)) {
+      return storedLang;
+    }
+  }
+  return "en";
+};
+
+const getInitialTheme = (): Theme => {
+  if (typeof window !== "undefined") {
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme === "light" || storedTheme === "dark") {
+      return storedTheme;
+    }
+  }
+  return "light";
+};
 
 export interface UserData {
   username: string
@@ -38,17 +63,15 @@ const screenTransition: Transition = {
 
 export default function TradingBotApp() {
   const [mounted, setMounted] = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+
   useEffect(() => {
     setMounted(true)
   }, [])
 
   const [appState, setAppState] = useState<AppState>(() => {
-    let language: Language = "en"
-    let theme: Theme = "light"
-    if (typeof window !== "undefined") {
-      language = (localStorage.getItem("language") as Language) || "en"
-      theme = (localStorage.getItem("theme") as Theme) || "light"
-    }
+    const language = getInitialLanguage();
+    const theme = getInitialTheme();
     return {
       currentScreen: "broker-selection",
       selectedBroker: null,
@@ -69,17 +92,19 @@ export default function TradingBotApp() {
     }
   }, [appState.language, appState.theme])
 
-  if (!mounted) return null
+  if (!mounted) return <LoadingSpinner />
 
   const updateAppState = (updates: Partial<AppState>) => {
     setAppState((prev) => ({ ...prev, ...updates }))
   }
 
   const goToScreen = (screen: AppState["currentScreen"]) => {
+    setIsTransitioning(true);
     setAppState((prev) => ({ ...prev, currentScreen: screen }))
   }
 
   const handleBrokerSelect = (broker: Broker) => {
+    setIsTransitioning(true);
     updateAppState({
       selectedBroker: broker,
       currentScreen: "login",
@@ -87,6 +112,7 @@ export default function TradingBotApp() {
   }
 
   const handleLogin = (userData: UserData) => {
+    setIsTransitioning(true);
     updateAppState({
       userData,
       currentScreen: "dashboard",
@@ -94,6 +120,7 @@ export default function TradingBotApp() {
   }
 
   const handleLogout = () => {
+    setIsTransitioning(true);
     updateAppState({
       userData: null,
       selectedBroker: null,
@@ -106,6 +133,19 @@ export default function TradingBotApp() {
     <div className={`min-h-screen ${appState.theme === "dark" ? "dark" : ""}`}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <AnimatePresence mode="wait">
+          {isTransitioning && (
+            <motion.div
+              key="loading-spinner"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 flex items-center justify-center z-40 bg-background/50 backdrop-blur-sm"
+            >
+              <LoadingSpinner />
+            </motion.div>
+          )}
+
           {appState.currentScreen === "broker-selection" && (
             <motion.div
               key="broker-selection"
@@ -114,8 +154,9 @@ export default function TradingBotApp() {
               exit={{ opacity: 0, x: 100 }}
               transition={screenTransition}
               className="h-screen"
+              onAnimationComplete={() => setIsTransitioning(false)}
             >
-              <BrokerSelectionScreen onBrokerSelect={handleBrokerSelect} />
+              <BrokerSelectionScreen onBrokerSelect={handleBrokerSelect} language={appState.language} />
             </motion.div>
           )}
 
@@ -127,6 +168,7 @@ export default function TradingBotApp() {
               exit={{ opacity: 0, x: 100 }}
               transition={screenTransition}
               className="h-screen"
+              onAnimationComplete={() => setIsTransitioning(false)}
             >
               <LoginScreen
                 broker={appState.selectedBroker!}
@@ -144,6 +186,7 @@ export default function TradingBotApp() {
               exit={{ opacity: 0, x: 100 }}
               transition={screenTransition}
               className="min-h-screen"
+              onAnimationComplete={() => setIsTransitioning(false)}
             >
               <MainDashboard
                 userData={appState.userData!}

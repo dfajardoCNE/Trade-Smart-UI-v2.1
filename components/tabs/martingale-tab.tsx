@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "motion/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,12 @@ import type { Language } from "@/app/page"
 
 interface MartingaleTabProps {
   language: Language
+}
+
+interface MartingaleTabState {
+  martingaleEnabled: boolean;
+  multiplier: number;
+  maxSteps: number;
 }
 
 const translations = {
@@ -58,29 +64,84 @@ const translations = {
   },
 }
 
-export function MartingaleTab({ language }: MartingaleTabProps) {
-  const [martingaleEnabled, setMartingaleEnabled] = useState(false)
-  const [multiplier, setMultiplier] = useState([2])
-  const [maxSteps, setMaxSteps] = useState([3])
+// Custom hook for localStorage management
+function useMartingaleLocalStorage() {
+  const STORAGE_KEY = "martingaleTab_state";
 
-  const t = translations[language]
+  const defaultState: MartingaleTabState = {
+    martingaleEnabled: false,
+    multiplier: 2,
+    maxSteps: 3,
+  };
 
-  const calculateRisk = () => {
-    if (!martingaleEnabled) return 0
-    let totalRisk = 1
-    for (let i = 1; i < maxSteps[0]; i++) {
-      totalRisk += Math.pow(multiplier[0], i)
+  function getStoredState(): MartingaleTabState {
+    if (typeof window === "undefined") return defaultState;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        return { ...defaultState, ...JSON.parse(stored) };
+      }
+    } catch (error) {
+      console.error("Failed to parse martingaleTab_state from localStorage:", error);
     }
-    return totalRisk
+    return defaultState;
   }
 
-  const handleSaveConfiguration = () => {
-    // Simulate saving configuration
-    console.log("Configuration saved:", {
-      enabled: martingaleEnabled,
-      multiplier: multiplier[0],
-      maxSteps: maxSteps[0],
-    })
+  function setStoredState(newState: MartingaleTabState) {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+    } catch (error) {
+      console.error("Failed to save martingaleTab_state to localStorage:", error);
+    }
+  }
+
+  return { getStoredState, setStoredState, STORAGE_KEY, defaultState };
+}
+
+export function MartingaleTab({ language }: MartingaleTabProps) {
+  const t = translations[language]
+  const { getStoredState, setStoredState, STORAGE_KEY, defaultState } = useMartingaleLocalStorage();
+
+  // State
+  const [state, setState] = useState<MartingaleTabState>(getStoredState());
+
+  // Sync state with localStorage on mount and storage events
+  useEffect(() => {
+    function handleStorage(e: StorageEvent) {
+      if (e.key === STORAGE_KEY) {
+        setState(getStoredState());
+      }
+    }
+    window.addEventListener("storage", handleStorage);
+    // On mount, sync state
+    setState(getStoredState());
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  // Update localStorage whenever state changes
+  useEffect(() => {
+    setStoredState(state);
+  }, [state]);
+
+  // Handlers
+  const handleEnableChange = (checked: boolean) => {
+    setState((s) => ({ ...s, martingaleEnabled: checked }));
+  };
+  const handleMultiplierChange = (val: number[]) => {
+    setState((s) => ({ ...s, multiplier: val[0] }));
+  };
+  const handleMaxStepsChange = (val: number[]) => {
+    setState((s) => ({ ...s, maxSteps: val[0] }));
+  };
+
+  const calculateRisk = () => {
+    if (!state.martingaleEnabled) return 0
+    let totalRisk = 1
+    for (let i = 1; i < state.maxSteps; i++) {
+      totalRisk += Math.pow(state.multiplier, i)
+    }
+    return totalRisk
   }
 
   return (
@@ -115,10 +176,10 @@ export function MartingaleTab({ language }: MartingaleTabProps) {
                 <Label>{t.enableMartingale}</Label>
                 <p className="text-xs text-muted-foreground">{t.enableDescription}</p>
               </div>
-              <Switch checked={martingaleEnabled} onCheckedChange={setMartingaleEnabled} />
+              <Switch checked={state.martingaleEnabled} onCheckedChange={handleEnableChange} />
             </div>
 
-            {martingaleEnabled && (
+            {state.martingaleEnabled && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -126,11 +187,11 @@ export function MartingaleTab({ language }: MartingaleTabProps) {
               >
                 <div className="space-y-2">
                   <Label>
-                    {t.multiplier}: {multiplier[0]}x
+                    {t.multiplier}: {state.multiplier}x
                   </Label>
                   <Slider
-                    value={multiplier}
-                    onValueChange={setMultiplier}
+                    value={[state.multiplier]}
+                    onValueChange={handleMultiplierChange}
                     max={5}
                     min={1.5}
                     step={0.1}
@@ -141,9 +202,9 @@ export function MartingaleTab({ language }: MartingaleTabProps) {
 
                 <div className="space-y-2">
                   <Label>
-                    {t.maxSteps}: {maxSteps[0]}
+                    {t.maxSteps}: {state.maxSteps}
                   </Label>
-                  <Slider value={maxSteps} onValueChange={setMaxSteps} max={10} min={1} step={1} className="w-full" />
+                  <Slider value={[state.maxSteps]} onValueChange={handleMaxStepsChange} max={10} min={1} step={1} className="w-full" />
                   <p className="text-xs text-muted-foreground">{t.maxStepsDescription}</p>
                 </div>
               </motion.div>
@@ -160,7 +221,7 @@ export function MartingaleTab({ language }: MartingaleTabProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {martingaleEnabled ? (
+            {state.martingaleEnabled ? (
               <>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
@@ -171,12 +232,12 @@ export function MartingaleTab({ language }: MartingaleTabProps) {
                   <div className="space-y-2">
                     <Label className="text-sm">{t.stepProgression}</Label>
                     <div className="space-y-1">
-                      {Array.from({ length: maxSteps[0] }, (_, i) => (
+                      {Array.from({ length: state.maxSteps }, (_, i) => (
                         <div key={i} className="flex justify-between text-xs">
                           <span>
                             {t.step} {i + 1}:
                           </span>
-                          <span>{Math.pow(multiplier[0], i).toFixed(1)}x</span>
+                          <span>{Math.pow(state.multiplier, i).toFixed(1)}x</span>
                         </div>
                       ))}
                     </div>
@@ -186,7 +247,7 @@ export function MartingaleTab({ language }: MartingaleTabProps) {
                 <Alert>
                   <AlertDescription className="text-xs">
                     {t.riskWarning
-                      .replace("{steps}", maxSteps[0].toString())
+                      .replace("{steps}", state.maxSteps.toString())
                       .replace("{multiplier}", calculateRisk().toFixed(1))}
                   </AlertDescription>
                 </Alert>
@@ -208,7 +269,7 @@ export function MartingaleTab({ language }: MartingaleTabProps) {
         transition={{ delay: 0.2 }}
         className="flex justify-start"
       >
-        <Button onClick={handleSaveConfiguration} size="lg" className="flex items-center gap-2">
+        <Button size="lg" className="hidden items-center gap-2"> {/* TODO: oculto temporalmente */}
           <Save className="h-4 w-4" />
           {t.saveConfiguration}
         </Button>

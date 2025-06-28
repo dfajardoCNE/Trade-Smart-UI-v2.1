@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, Dispatch, SetStateAction } from "react"
 import { motion } from "motion/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -11,6 +11,10 @@ import type { Language } from "@/app/page"
 
 interface RiskManagementTabProps {
   language: Language
+  profitTarget: number[]
+  setProfitTarget: Dispatch<SetStateAction<number[]>>
+  maxDailyLoss: number[]
+  setMaxDailyLoss: Dispatch<SetStateAction<number[]>>
 }
 
 const translations = {
@@ -74,14 +78,58 @@ const translations = {
   },
 }
 
-export function RiskManagementTab({ language, profitTarget, setProfitTarget, maxDailyLoss, setMaxDailyLoss }: RiskManagementTabProps & {
-  profitTarget: number[];
-  setProfitTarget: (v: number[]) => void;
-  maxDailyLoss: number[];
-  setMaxDailyLoss: (v: number[]) => void;
-}) {
+// Helpers para localStorage con objeto único para este tab
+function getRiskManagementTabState() {
+  if (typeof window === "undefined") return null;
+  try {
+    const val = localStorage.getItem("riskManagementTab_state");
+    if (!val) return null;
+    return JSON.parse(val);
+  } catch {
+    return null;
+  }
+}
+function setRiskManagementTabState(newState: any) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("riskManagementTab_state", JSON.stringify(newState));
+  } catch {}
+}
+
+export function RiskManagementTab({ language, profitTarget, setProfitTarget, maxDailyLoss, setMaxDailyLoss }: RiskManagementTabProps) {
   const t = translations[language]
-  const [profitPercentPerTrade, setProfitPercentPerTrade] = useState<number[]>([50]) // Nuevo valor inicial 50
+  // Estado persistente
+  const [state, setState] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = getRiskManagementTabState();
+      return saved || {
+        profitTarget: [100],
+        maxDailyLoss: [20],
+        profitPercentPerTrade: [50],
+      };
+    }
+    return {
+      profitTarget: [100],
+      maxDailyLoss: [20],
+      profitPercentPerTrade: [50],
+    };
+  });
+
+  // Sincronizar localStorage cuando cambie el estado
+  useEffect(() => {
+    setRiskManagementTabState(state);
+  }, [state]);
+
+  // Leer siempre el estado más reciente de localStorage al montar y cuando cambie la clave desde otra pestaña
+  useEffect(() => {
+    function syncFromStorage() {
+      const latest = getRiskManagementTabState();
+      if (latest) setState(latest);
+    }
+    window.addEventListener("storage", syncFromStorage);
+    syncFromStorage();
+    return () => window.removeEventListener("storage", syncFromStorage);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -97,11 +145,11 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>
-                {t.profitTarget}: ${profitTarget[0]}
+                {t.profitTarget}: ${state.profitTarget[0]}
               </Label>
               <Slider
-                value={profitTarget}
-                onValueChange={setProfitTarget}
+                value={state.profitTarget}
+                onValueChange={v => setState((s: typeof state) => ({ ...s, profitTarget: v }))}
                 max={1000}
                 min={10}
                 step={10}
@@ -109,7 +157,7 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
               />
             </div>
             <Badge variant="outline" className="w-full justify-center">
-              {t.generalTarget.replace("{amount}", profitTarget[0].toString())}
+              {t.generalTarget.replace("{amount}", state.profitTarget[0].toString())}
             </Badge>
           </CardContent>
         </Card>
@@ -125,11 +173,11 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>
-                {language === "es" ? "Porcentaje deseado por operación" : "Desired percent per trade"}: {profitPercentPerTrade[0]}%
+                {language === "es" ? "Porcentaje deseado por operación" : "Desired percent per trade"}: {state.profitPercentPerTrade[0]}%
               </Label>
               <Slider
-                value={profitPercentPerTrade}
-                onValueChange={setProfitPercentPerTrade}
+                value={state.profitPercentPerTrade}
+                onValueChange={v => setState((s: typeof state) => ({ ...s, profitPercentPerTrade: v }))}
                 max={99}
                 min={50}
                 step={1}
@@ -137,7 +185,7 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
               />
             </div>
             <Badge variant="outline" className="w-full justify-center">
-              {profitPercentPerTrade[0]}% {language === "es" ? "de ganancia por operación" : "profit per trade"}
+              {state.profitPercentPerTrade[0]}% {language === "es" ? "de ganancia por operación" : "profit per trade"}
             </Badge>
           </CardContent>
         </Card>
@@ -153,11 +201,11 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>
-                {t.maxDailyLoss}: ${maxDailyLoss[0]}
+                {t.maxDailyLoss}: ${state.maxDailyLoss[0]}
               </Label>
               <Slider
-                value={maxDailyLoss}
-                onValueChange={setMaxDailyLoss}
+                value={state.maxDailyLoss}
+                onValueChange={v => setState((s: typeof state) => ({ ...s, maxDailyLoss: v }))}
                 max={100}
                 min={10}
                 step={1}
@@ -165,7 +213,7 @@ export function RiskManagementTab({ language, profitTarget, setProfitTarget, max
               />
             </div>
             <Badge variant="destructive" className="w-full justify-center">
-              {t.stopAtLoss.replace("{amount}", maxDailyLoss[0].toString())}
+              {t.stopAtLoss.replace("{amount}", state.maxDailyLoss[0].toString())}
             </Badge>
           </CardContent>
         </Card>

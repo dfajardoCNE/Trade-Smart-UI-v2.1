@@ -10,9 +10,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { Bell, TrendingUp, AlertTriangle, CheckCircle, XCircle } from "lucide-react"
+import { Bell, TrendingUp, AlertTriangle, CheckCircle, XCircle, Trash2, Eye, EyeOff } from "lucide-react"
 import type { Language } from "@/app/page"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/animate-ui/components/tooltip"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
+interface Notification {
+  id: number;
+  type: "success" | "warning" | "info" | "loss";
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+}
 
 interface NotificationBellProps {
   language: Language
@@ -22,6 +32,7 @@ const translations = {
   en: {
     notifications: "Notifications",
     markAllRead: "Mark all as read",
+    clearAll: "Clear all",
     noNotifications: "No new notifications",
     tradingAlert: "Trading Alert",
     riskWarning: "Risk Warning",
@@ -32,10 +43,13 @@ const translations = {
     tradeOpened: "Trade opened",
     tradeResultWin: "Trade closed: WIN",
     tradeResultLoss: "Trade closed: LOSS",
+    markAsRead: "Mark as read",
+    markAsUnread: "Mark as unread",
   },
   es: {
     notifications: "Notificaciones",
     markAllRead: "Marcar todo como leído",
+    clearAll: "Limpiar todo",
     noNotifications: "No hay notificaciones nuevas",
     tradingAlert: "Alerta de Trading",
     riskWarning: "Advertencia de Riesgo",
@@ -46,11 +60,13 @@ const translations = {
     tradeOpened: "Operación abierta",
     tradeResultWin: "Operación cerrada: GANADA",
     tradeResultLoss: "Operación cerrada: PERDIDA",
+    markAsRead: "Marcar como leída",
+    markAsUnread: "Marcar como no leída",
   },
 }
 
 export function NotificationBell({ language, tooltipSide = "top" }: NotificationBellProps & { tooltipSide?: "top" | "bottom" | "left" | "right" }) {
-  const [notifications] = useState([
+  const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 1,
       type: "success",
@@ -104,6 +120,18 @@ export function NotificationBell({ language, tooltipSide = "top" }: Notification
   const t = translations[language]
   const unreadCount = notifications.filter((n) => !n.read).length
 
+  const markAllAsRead = () => {
+    setNotifications(notifications.map((n) => ({ ...n, read: true })));
+  };
+
+  const clearAllNotifications = () => {
+    setNotifications([]);
+  };
+
+  const toggleReadStatus = (id: number) => {
+    setNotifications(notifications.map(n => n.id === id ? { ...n, read: !n.read } : n));
+  };
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "success":
@@ -140,31 +168,63 @@ export function NotificationBell({ language, tooltipSide = "top" }: Notification
         <DropdownMenuContent align="end" className="w-80 bg-popover dark:bg-popover border-border dark:border-border">
           <div className="flex items-center justify-between p-2">
             <h3 className="font-semibold">{t.notifications}</h3>
-            {unreadCount > 0 && (
-              <Button variant="ghost" size="sm" className="text-xs">
-                {t.markAllRead}
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
+                <Tooltip side="bottom">
+                  <TooltipTrigger>
+                    <Button variant="ghost" size="sm" className="text-xs px-2" onClick={markAllAsRead}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t.markAllRead}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              <Tooltip side="bottom">
+                <TooltipTrigger>
+                  <Button variant="ghost" size="sm" className="text-xs px-2 text-red-500" onClick={clearAllNotifications}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t.clearAll}</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
           <DropdownMenuSeparator />
-          {notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <DropdownMenuItem
-                key={notification.id}
-                className="flex items-start gap-3 p-3 text-popover-foreground dark:text-popover-foreground hover:bg-accent dark:hover:bg-accent"
-              >
-                {getNotificationIcon(notification.type)}
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium">{notification.title}</p>
-                  <p className="text-xs text-muted-foreground">{notification.message}</p>
-                  <p className="text-xs text-muted-foreground">{notification.time}</p>
-                </div>
-                {!notification.read && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
-              </DropdownMenuItem>
-            ))
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">{t.noNotifications}</div>
-          )}
+          <ScrollArea className="h-64">
+            {notifications.length > 0 ? (
+              notifications.map((notification) => (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className="flex items-start gap-3 p-3 text-popover-foreground dark:text-popover-foreground hover:bg-accent dark:hover:bg-accent cursor-pointer"
+                  onClick={() => toggleReadStatus(notification.id)}
+                >
+                  {getNotificationIcon(notification.type)}
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium">{notification.title}</p>
+                    <p className="text-xs text-muted-foreground">{notification.message}</p>
+                    <p className="text-xs text-muted-foreground">{notification.time}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto h-auto p-1 text-muted-foreground hover:bg-muted"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleReadStatus(notification.id);
+                    }}
+                  >
+                    {notification.read ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </DropdownMenuItem>
+              ))
+            ) : (
+              <div className="p-4 text-center text-muted-foreground">{t.noNotifications}</div>
+            )}
+          </ScrollArea>
         </DropdownMenuContent>
       </DropdownMenu>
       <TooltipContent>
