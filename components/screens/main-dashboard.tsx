@@ -166,7 +166,7 @@ export function MainDashboard({
         </motion.header>
 
         {/* Main Content */}
-        <main className="container mx-auto px-4 pt-[110px] pb-[160px] relative h-[calc(100vh-30px)] overflow-y-auto ">
+        <main className="container mx-auto px-1 sm:px-4 pt-[220px] sm:pt-[120px] pb-[11rem] sm:pb-24 relative min-h-screen overflow-y-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
