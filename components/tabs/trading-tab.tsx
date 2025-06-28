@@ -168,62 +168,62 @@ const currencyPairs = [
   {
     id: "EURUSD",
     name: "EUR/USD",
-    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "GBPUSD",
     name: "GBP/USD",
-    flag1: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "USDJPY",
     name: "USD/JPY",
-    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "USDCHF",
     name: "USD/CHF",
-    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-ch rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-ch rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "AUDUSD",
     name: "AUD/USD",
-    flag1: <span className="fi fi-au rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-au rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "USDCAD",
     name: "USD/CAD",
-    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-ca rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-ca rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "NZDUSD",
     name: "NZD/USD",
-    flag1: <span className="fi fi-nz rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-nz rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-us rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "EURGBP",
     name: "EUR/GBP",
-    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "EURJPY",
     name: "EUR/JPY",
-    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-eu rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
   {
     id: "GBPJPY",
     name: "GBP/JPY",
-    flag1: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block" />,
-    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block" />,
+    flag1: <span className="fi fi-gb rounded-full w-6 h-6 border-2 border-white shadow z-10 inline-block dark:border-slate-700" />,
+    flag2: <span className="fi fi-jp rounded-full w-6 h-6 border-2 border-white shadow inline-block dark:border-slate-700" />,
   },
 ]
 
@@ -392,12 +392,12 @@ export function TradingTab({ language, canStartBot, onStartBot }: TradingTabProp
                         className="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer text-foreground dark:text-foreground focus:bg-accent dark:focus:bg-accent justify-between"
                       >
                         {/* Banderas */}
-                        <span className="flex items-center mr-4">
-                          <span className="w-6 h-6 rounded-full border shadow bg-white flex items-center justify-center overflow-hidden">
-                            <span className="w-full h-full object-cover flex items-center justify-center">{pair.flag1}</span>
+                        <span className="flex items-center">
+                          <span className="w-6 h-6 rounded-full border shadow bg-white flex items-center justify-center overflow-hidden dark:bg-slate-700 dark:border-slate-700">
+                            <span className="w-full h-full object-cover flex items-center justify-center dark:bg-slate-700">{pair.flag1}</span>
                           </span>
-                          <span className="w-6 h-6 rounded-full border shadow bg-white flex items-center justify-center overflow-hidden -ml-2 z-10 translate-y-1">
-                            <span className="w-full h-full object-cover flex items-center justify-center">{pair.flag2}</span>
+                          <span className="w-6 h-6 rounded-full border shadow bg-white flex items-center justify-center overflow-hidden -ml-2 z-10 translate-y-1 dark:bg-slate-700 dark:border-slate-700">
+                            <span className="w-full h-full object-cover flex items-center justify-center dark:bg-slate-700">{pair.flag2}</span>
                           </span>
                         </span>
                         {/* Nombre del par */}
