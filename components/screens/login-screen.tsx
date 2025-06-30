@@ -86,17 +86,6 @@ export function LoginScreen({ broker, onLogin, onBack }: LoginScreenProps) {
               {!useApiKey ? (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      type="text"
-                      placeholder="Enter your username"
-                      value={credentials.username}
-                      onChange={(e) => setCredentials((prev) => ({ ...prev, username: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"

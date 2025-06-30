@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import type { AccountType, Language } from "@/app/page"
 
 const translations = {
@@ -17,12 +16,14 @@ const translations = {
     real: "REAL",
     practiceLabel: "Practice",
     realLabel: "Real",
+    reload: "Reload",
   },
   es: {
     practice: "PRÁCTICA",
     real: "REAL",
-    practiceLabel: "De Práctica",
+    practiceLabel: "Práctica",
     realLabel: "Real",
+    reload: "Recargar",
   },
 }
 
@@ -55,9 +56,22 @@ export function AccountTypeDropdown({ accountType, balance, language, onChange }
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem
           onClick={() => onChange("PRACTICE")}
-          className={isPractice ? "font-bold text-orange-600 dark:text-orange-400" : ""}
+          className={isPractice ? "font-bold text-orange-600 dark:text-orange-400 flex items-center justify-between" : "flex items-center justify-between"}
         >
-          {t.practiceLabel}
+          <span>{t.practiceLabel}</span>
+          {isPractice && (
+            <button
+              type="button"
+              className="ml-2 text-xs text-blue-600 hover:underline focus:outline-none"
+              onClick={e => {
+                e.stopPropagation();
+                // TODO: Implementar la lógica de recarga aquí
+                alert(t.reload);
+              }}
+            >
+              {t.reload}
+            </button>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => onChange("REAL")}
