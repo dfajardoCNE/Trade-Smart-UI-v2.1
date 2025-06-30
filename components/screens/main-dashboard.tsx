@@ -1,10 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { motion } from "motion/react"
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Play, Square, Activity } from "lucide-react"
 import type { UserData, BotStatus, AccountType, Language, Theme } from "@/app/page"
 import { TradingTab } from "@/components/tabs/trading-tab"
 import { RiskManagementTab } from "@/components/tabs/risk-management-tab"
@@ -14,7 +12,6 @@ import { UserProfileSection } from "@/components/ui/user-profile-section"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { LanguageSelector } from "@/components/ui/language-selector"
 import { NotificationBell } from "@/components/ui/notification-bell"
-import { Badge } from "@/components/ui/badge"
 import { FloatingExecutionBot } from "@/components/ui/floating-execution-bot"
 import { AccountTypeDropdown } from "@/components/ui/account-type-dropdown"
 import { useTradingTabValidation } from "@/hooks/use-trading-tab-validation"
@@ -115,22 +112,16 @@ export function MainDashboard({
     }
   }
 
-  const getBalanceColor = () => {
-    return userData.accountType === "REAL"
-      ? "text-green-600 dark:text-green-400"
-      : "text-orange-600 dark:text-orange-400"
-  }
-
   const canStartBot = useTradingTabValidation();
 
   return (
     <TooltipProvider>
-      <div className="h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-0 left-0 w-full bg-card dark:bg-card border-b border-border dark:border-border shadow-sm z-30 pb-4"
+          className="top-0 left-0 w-full bg-card dark:bg-card border-b border-border dark:border-border shadow-sm z-30 pb-4"
         >
           <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
@@ -166,7 +157,7 @@ export function MainDashboard({
         </motion.header>
 
         {/* Main Content */}
-        <main className="container mx-auto px-1 sm:px-4 pt-[220px] sm:pt-[120px] pb-[11rem] sm:pb-24 relative min-h-screen overflow-y-auto">
+        <main className="container mx-auto px-4 pt-[30px] pb-[12rem] relative min-h-screen">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">

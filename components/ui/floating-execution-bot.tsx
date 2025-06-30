@@ -34,7 +34,7 @@ export function FloatingExecutionBot({
   canStart,
 }: FloatingExecutionBotProps) {
   return (
-    <div className="fixed left-0 right-0 bottom-0 w-full flex justify-center items-end pointer-events-none z-40 pb-24 sm:pb-24">
+    <div className="fixed left-0 right-0 bottom-0 w-full flex justify-center px-4 items-end pointer-events-none z-40 pb-24 sm:pb-24">
       <div className="w-full flex justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
