@@ -42,9 +42,7 @@
 ## 🖥️ Demo visual
 
 <div align="center">
-  <img src="public/trading-view.png" alt="Dashboard" width="600" />
-  <br/>
-  <img src="public/iq-options.png" alt="Broker IQ Option" width="200" />
+  <img src="public/trade-smart.png" alt="Dashboard" width="600" />
 </div>
 
 ---
