@@ -57,10 +57,12 @@ $ git clone https://github.com/tuusuario/Trade-Smart-UI-v2.1.git
 $ cd Trade-Smart-UI-v2.1
 
 # 2. Instala dependencias
-$ pnpm install
+$ pnpm install 
+$ npm install --legacy-peer-deps
 
 # 3. Ejecuta en modo desarrollo
 $ pnpm dev
+$ npm run dev
 ```
 
 ---
@@ -147,7 +149,7 @@ $ pnpm dev
 
 ## 👨‍💻 Autoría y créditos
 
-Hecho con ♥ por [@Darling.dev](https://github.com/dfajardoCNE) — 2025
+Hecho con ♥ por [@darling.dev](https://github.com/dfajardoCNE) — 2025
 
 ---
 

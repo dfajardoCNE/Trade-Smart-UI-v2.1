@@ -40,8 +40,8 @@ export function LoginScreen({ broker, onLogin, onBack }: LoginScreenProps) {
 
     // Mock successful login
     const userData: UserData = {
-      username: credentials.username || "demo_user",
-      email: credentials.email || "demo@example.com",
+      username: credentials.username || "darling.dev",
+      email: credentials.email || "darlingf1998@gmail.com",
       accountType: "PRACTICE",
       balance: 10000,
       broker,

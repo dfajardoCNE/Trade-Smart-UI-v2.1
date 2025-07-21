@@ -147,7 +147,7 @@ $ pnpm dev
 
 ## 👨‍💻 Autoría y créditos
 
-Hecho con ♥ por [@Darling.dev](https://github.com/tuusuario) — 2025
+Hecho con ♥ por [@darling.dev](https://github.com/tuusuario) — 2025
 
 ---
 

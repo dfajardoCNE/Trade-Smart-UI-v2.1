@@ -4,11 +4,11 @@ export function AppFooter({ language = "es" }: { language?: "es" | "en" }) {
   const t = {
     es: {
       copyright: "© 2025 Tu Plataforma de Trading Automatizado. Todos los derechos reservados.",
-      made: "Hecho con ♥ por @Darling.dev."
+      made: "Hecho con ♥ por @darling.dev."
     },
     en: {
       copyright: "© 2025 Your Automated Trading Platform. All rights reserved.",
-      made: "Made with ♥ by @Darling.dev."
+      made: "Made with ♥ by @darling.dev."
     }
   }[language]
 

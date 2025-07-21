@@ -6,6 +6,7 @@ import type { Transition } from "motion"
 import { BrokerSelectionScreen } from "@/components/screens/broker-selection-screen"
 import { LoginScreen } from "@/components/screens/login-screen"
 import { MainDashboard } from "@/components/screens/main-dashboard"
+import { Loader } from "lucide-react"
 
 export type Broker = "iq-option" | "tradingview"
 export type AccountType = "REAL" | "PRACTICE"
@@ -69,7 +70,16 @@ export default function TradingBotApp() {
     }
   }, [appState.language, appState.theme])
 
-  if (!mounted) return null
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="flex flex-col items-center gap-4">
+          <Loader className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-lg font-medium">Cargando TradeSmart...</p>
+        </div>
+      </div>
+    )
+  }
 
   const updateAppState = (updates: Partial<AppState>) => {
     setAppState((prev) => ({ ...prev, ...updates }))
