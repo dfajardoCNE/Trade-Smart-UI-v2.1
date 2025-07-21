@@ -1,9 +1,9 @@
-# 🚀 TradeSmart (open-in-v0)
+# 🚀 TradeSmart (Trade-Smart-UI-v2.1)
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.2.4-blue?logo=nextdotjs) ![React](https://img.shields.io/badge/React-19-blue?logo=react) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-38bdf8?logo=tailwindcss) ![Estado](https://img.shields.io/badge/Status-Activo-brightgreen)
 
 <div align="center">
-  <img src="public/placeholder-logo.png" alt="Logo" width="120" />
+  <img src="public/placeholder-logo.png" alt="Logo" width="300" />
   <h1 style="font-family: 'Montserrat', sans-serif; font-weight: 700;">TradeSmart</h1>
   <p>Plataforma moderna de trading automatizado, con UI animada, gestión de riesgo y soporte multilenguaje.</p>
 </div>
@@ -53,8 +53,8 @@
 
 ```bash
 # 1. Clona el repositorio
-$ git clone https://github.com/tuusuario/open-in-v0.git
-$ cd open-in-v0
+$ git clone https://github.com/tuusuario/Trade-Smart-UI-v2.1.git
+$ cd Trade-Smart-UI-v2.1
 
 # 2. Instala dependencias
 $ pnpm install
@@ -147,7 +147,7 @@ $ pnpm dev
 
 ## 👨‍💻 Autoría y créditos
 
-Hecho con ♥ por [@Darling.dev](https://github.com/tuusuario) — 2025
+Hecho con ♥ por [@Darling.dev](https://github.com/dfajardoCNE) — 2025
 
 ---
 
